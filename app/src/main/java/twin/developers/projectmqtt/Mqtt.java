@@ -17,8 +17,8 @@ public class Mqtt {
     private static final String TAG = "MQTT";
     private static final String MQTT_SERVER = "tcp://broker.emqx.io:1883";
     //private static final String MQTT_SERVER = "tcp://127.0.0.1:1883";
-    private static final String CLIENT_ID = "AndroidSample12312312312312312";
-    private static final String TOPIC = "iot/lab/test";
+    private static final String CLIENT_ID = "mqttx_17947d6a";
+    private static final String TOPIC = "Android/Paciente/Hora";
     private static String MESSAGE = "";
     private static final int QOS = 2;
 

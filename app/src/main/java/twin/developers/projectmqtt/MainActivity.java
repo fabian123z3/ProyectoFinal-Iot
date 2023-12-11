@@ -1,50 +1,58 @@
 package twin.developers.projectmqtt;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.TimePicker;
 
 import androidx.appcompat.app.AppCompatActivity;
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.w3c.dom.Text;
 
+import java.util.Calendar;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    private Mqtt mqttManager;
-    EditText texto;
-    Button btnEnviar;
 
+    private Mqtt mqttManager;
+    private Button btnEnviar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        texto = findViewById(R.id.txtMessage);
-        btnEnviar = findViewById(R.id.btnPublish);
-
         mqttManager = new Mqtt(getApplicationContext());
         mqttManager.connectToMqttBroker();
+
+        btnEnviar = findViewById(R.id.buttonEnviarHora);
 
         btnEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mqttManager.publishMessage(texto.getText().toString());
+                mostrarTimePickerDialog();
             }
         });
-
     }
 
+    private void mostrarTimePickerDialog() {
+        final Calendar calendario = Calendar.getInstance();
+        int hora = calendario.get(Calendar.HOUR_OF_DAY);
+        int minutos = calendario.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String horaFormateada = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
+                        // Envía la hora a MQTT
+                        mqttManager.publishMessage(horaFormateada);
+                    }
+                },
+                hora,
+                minutos,
+                true // true si quieres el formato de 24 horas, false si prefieres el formato de 12 horas
+        );
+        timePickerDialog.show();
+    }
 }
